@@ -1,6 +1,7 @@
 #include "fins.h"
 #include "pid.h"
 #include "quaternion.h"
+#include "logger.h"
 #include <Adafruit_BNO08x.h>
 
 Adafruit_BNO08x imu;
@@ -13,6 +14,8 @@ fins fin(finPins, 3);
 pid pitchPID(0, 0, 0);
 pid rollPID(0, 0, 0);
 
+logger flightLogger(10);
+
 unsigned long lastTime = 0;
 
 void setup() {
@@ -23,6 +26,8 @@ void setup() {
         delay(1000);
     }
     Serial.println("IMU started");
+    
+    flightLogger.begin();
     
     imu.enableReport(SH2_ROTATION_VECTOR);
 }
@@ -69,5 +74,11 @@ void loop() {
         if (angleThree < 0) angleThree = 0;
         if (angleThree > 180) angleThree = 180;
         fin.setFinPos(2, angleThree);
+
+        flightLogger.finLogger(millis(), 0, angleOne);
+        flightLogger.finLogger(millis(), 1, angleTwo);
+        flightLogger.finLogger(millis(), 2, angleThree);
+
+        flightLogger.quatLogger(millis(), q2.w(), q2.x(), q2.y(), q2.z(), error.w(), error.x(), error.y(), error.z(), pitch, roll, pitchOutput, rollOutput);
     }
 }
