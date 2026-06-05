@@ -2,6 +2,7 @@
 #include "pid.h"
 #include "quaternion.h"
 #include "logger.h"
+#include "accessPoint.h"
 #include <Adafruit_BNO08x.h>
 
 Adafruit_BNO08x imu;
@@ -14,20 +15,27 @@ fins fin(finPins, 3);
 pid pitchPID(0, 0, 0);
 pid rollPID(0, 0, 0);
 
-logger flightLogger(10);
+accessPoint preFlightAP("Ursus", "Spelaeus");
+
+logger flightLogger(10, preFlightAP);
 
 unsigned long lastTime = 0;
 
 void setup() {
     Serial.begin(115200);
-    Serial.println("Starting IMU");
+    delay(1000);
+    preFlightAP.activateAP();
+
+    preFlightAP.send("Starting IMU");
     while (!imu.begin_I2C()) {
-        Serial.println("IMU failed to boot, retrying...");
+        preFlightAP.send("IMU failed to boot, retrying...");
         delay(1000);
     }
-    Serial.println("IMU started");
+    preFlightAP.send("IMU started");
     
     flightLogger.begin();
+
+    preFlightAP.deactiveAP();
     
     imu.enableReport(SH2_ROTATION_VECTOR);
 }

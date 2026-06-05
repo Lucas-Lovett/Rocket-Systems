@@ -2,10 +2,11 @@
 #define LOGGER_H
 
 #include <SD.h>
+#include "accessPoint.h"
 
 class logger {
     public:
-        logger(int csPin);
+        logger(int csPin, accessPoint& ap);
 
         void finLogger(unsigned long timeStamp, int finIndex, float angle);
         void quatLogger(unsigned long timeStamp, float qw, float qx, float qy, float qz, float errorW, float errorX, float errorY, float errorZ, float pitch, float roll, float pitchOutput, float rollOutput);
@@ -14,6 +15,7 @@ class logger {
         File finLogs;
         File quatLogs;
         int csPin;
+        accessPoint& ap;
 };
 
 #endif

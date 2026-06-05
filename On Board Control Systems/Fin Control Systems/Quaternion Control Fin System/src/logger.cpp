@@ -1,24 +1,25 @@
 #include "logger.h"
 
-logger::logger(int pin) {
+logger::logger(int pin, accessPoint& ap) : ap(ap) {
     this->csPin = pin;
 }
 
 void logger::begin() {
-    Serial.println("Starting SD Card");
+    ap.send("Starting SD Card");
+    
     while (!SD.begin(csPin)) {
-        Serial.println("SD Card failed to start, retying...");
+        ap.send("SD Card failed to start, retying...");
         delay(1000);
     }
-    Serial.println("SD Card Started");
-    Serial.println("Creating Fin Logs");
+    ap.send("SD Card Started");
+    ap.send("Creating Fin Logs");
     finLogs = SD.open("finLogs.csv", FILE_WRITE);
     finLogs.println("timestamp, finIndex, angle");
-    Serial.println("Fin Logs Created");
-    Serial.println("Creating Quaternion Logs");
+    ap.send("Fin Logs Created");
+    ap.send("Creating Quaternion Logs");
     quatLogs = SD.open("quatLogs.csv", FILE_WRITE);
     quatLogs.println("timestamp, qw, qx, qy, qz, errorW, errorX, errorY, errorZ, pitch, roll, pitchOutput, rollOutput");
-    Serial.println("Quaternion Logs Created");
+    ap.send("Quaternion Logs Created");
 }
 
 void logger::finLogger(unsigned long timeStamp, int finIndex, float angle) {
